@@ -41,61 +41,69 @@ import kotlin.random.Random
  * @param onRemoveItem (event) request an item be removed
  */
 
-//@Composable
-//fun TodoItemInlineEditor(
-//    item: TodoItem,
-//    onEditItemChange: (TodoItem) -> Unit,
-//    onEditDone: () -> Unit,
-//    onRemoveItem: () -> Unit
-//) = TodoItemInput(
-//    text = item.task,
-//    onTextChange = { onEditItemChange(item.copy(task = it)) },
-//    icon = item.icon,
-//    onIconChange = { onEditItemChange(item.copy(icon = it)) },
-//    submit = onEditDone,
-//    iconsVisible = true){
-//    Row {
-//        val shrinkButtons = Modifier.widthIn(20.dp)
-//        TextButton(onClick = onEditDone, modifier = shrinkButtons) {
-//            Text(
-//                text = "\uD83D\uDCBE", // floppy disk
-//                textAlign = TextAlign.End,
-//                modifier = Modifier.width(30.dp)
-//            )
-//        }
-//        TextButton(onClick = onRemoveItem, modifier = shrinkButtons) {
-//            Text(
-//                text = "❌",
-//                textAlign = TextAlign.End,
-//                modifier = Modifier.width(30.dp)
-//            )
-//        }
-//    }
-//}
+@Composable
+fun TodoItemInlineEditor(
+    item: TodoItem,
+    onEditItemChange: (TodoItem) -> Unit,
+    onEditDone: () -> Unit,
+    onRemoveItem: () -> Unit
+) = TodoItemInput(
+    text = item.task,
+    onTextChange = { onEditItemChange(item.copy(task = it)) },
+    icon = item.icon,
+    onIconChange = { onEditItemChange(item.copy(icon = it)) },
+    submit = onEditDone,
+    iconsVisible = true
+)
 
 // stateless 즉 mutable state 가 없다.
 @Composable
 fun TodoScreen(
     items: List<TodoItem>,
+    currentlyEditing: TodoItem?,
     onAddItem: (TodoItem) -> Unit,
-    onRemoveItem: (TodoItem) -> Unit
+    onRemoveItem: (TodoItem) -> Unit,
+    onStartEdit: (TodoItem) -> Unit,
+    onEditItemChange: (TodoItem) -> Unit,
+    onEditDone: () -> Unit
 ) {
     Column {
 
-        TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
-            TodoItemEntryInput(onItemComplete = onAddItem)
+        val enableTopSection = currentlyEditing == null
+        TodoItemInputBackground(elevate = enableTopSection) {
+            if (enableTopSection) {
+                TodoItemEntryInput(onItemComplete = onAddItem)
+            } else {
+                Text(
+                    "Editing item",
+                    style = MaterialTheme.typography.h6,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                )
+            }
         }
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(top = 8.dp)
         ) {
-            items(items = items) { todo ->
-                TodoRow(
-                    todo = todo,
-                    onItemClicked = { onRemoveItem },
-                    modifier = Modifier.fillParentMaxWidth(),
-                    iconAlpha = 0.4f
-                )
+            items(items) { todo ->
+                if (currentlyEditing?.id == todo.id) {
+                    TodoItemInlineEditor(
+                        item = currentlyEditing,
+                        onEditItemChange = onEditItemChange,
+                        onEditDone = onEditDone,
+                        onRemoveItem = { onRemoveItem(todo) }
+                    )
+                } else {
+                    TodoRow(
+                        todo,
+                        onItemClicked = { onStartEdit(it) },
+                        modifier = Modifier.fillParentMaxWidth()
+                    )
+                }
             }
         }
 
