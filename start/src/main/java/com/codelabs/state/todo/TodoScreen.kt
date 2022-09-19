@@ -53,8 +53,25 @@ fun TodoItemInlineEditor(
     icon = item.icon,
     onIconChange = { onEditItemChange(item.copy(icon = it)) },
     submit = onEditDone,
-    iconsVisible = true
-)
+    iconsVisible = true) {
+    Row {
+        val shrinkButtons = Modifier.widthIn(20.dp)
+        TextButton(onClick = onEditDone, modifier = shrinkButtons) {
+            Text(
+                text = "\uD83D\uDCBE",
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(30.dp)
+            )
+        }
+        TextButton(onClick = onRemoveItem, modifier = shrinkButtons) {
+            Text(
+                text = "X",
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(30.dp)
+            )
+        }
+    }
+}
 
 // stateless 즉 mutable state 가 없다.
 @Composable
@@ -153,22 +170,14 @@ private fun randomTint(): Float {
     return Random.nextFloat().coerceIn(0.3f, 0.9f)
 }
 
-
+// Statefull 콤포저블 -> stateless 로 변경 (State hoisting)
 //@Composable
 //fun TodoInputTextField(text: String,
 //                       onTextChange: (String) -> Unit,
 //                       modifier: Modifier) {
+//
 //    TodoInputText(text, onTextChange, modifier)
 //}
-
-// Statefull 콤포저블 -> stateless 로 변경 (State hoisting)
-@Composable
-fun TodoInputTextField(text: String,
-                       onTextChange: (String) -> Unit,
-                       modifier: Modifier) {
-
-    TodoInputText(text, onTextChange, modifier)
-}
 
 @Composable
 fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
@@ -186,8 +195,9 @@ fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
         icon = icon,
         onIconChange = setIcon,
         submit = submit,
-        iconsVisible = iconsVisible
-    )
+        iconsVisible = iconsVisible) {
+        TodoEditButton(onClick = submit, text = "Add", enabled = text.isNotBlank())
+    }
 }
 
 
@@ -198,8 +208,8 @@ fun TodoItemInput(
     icon: TodoIcon,
     onIconChange: (TodoIcon) -> Unit,
     submit: () -> Unit,
-    iconsVisible : Boolean
-
+    iconsVisible : Boolean,
+    buttonSlot: @Composable () -> Unit
 ) {
 
     // onItemComplete is an event will fire when an item is completed by the user
@@ -217,12 +227,11 @@ fun TodoItemInput(
                     .padding(end = 8.dp),
                 onImeAction = submit
             )
-            TodoEditButton(
-                onClick = submit,
-                text = "Add",
-                modifier = Modifier.align(Alignment.CenterVertically),
-                enabled = text.isNotBlank()
-            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(modifier = Modifier.align(Alignment.CenterVertically)) {
+                buttonSlot()
+            }
         }
         if (iconsVisible) {
             AnimatedIconRow(icon = icon, onIconChange = onIconChange, Modifier.padding(8.dp))
@@ -231,26 +240,3 @@ fun TodoItemInput(
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun PreviewTodoItemInput() = TodoItemInput(onItemComplete = { })
-
-//@Preview
-//@Composable
-//fun PreviewTodoScreen() {
-//    val items = listOf(
-//        TodoItem("Learn compose", TodoIcon.Event),
-//        TodoItem("Take the codelab"),
-//        TodoItem("Apply state", TodoIcon.Done),
-//        TodoItem("Build dynamic UIs", TodoIcon.Square)
-//    )
-//    TodoScreen(items, {}, {})
-//}
-//
-//@Preview
-//@Composable
-//fun PreviewTodoRow() {
-//    val todo = remember { generateRandomTodoItem() }
-//    TodoRow(todo = todo, onItemClicked = {}, modifier = Modifier.fillMaxWidth())
-//}

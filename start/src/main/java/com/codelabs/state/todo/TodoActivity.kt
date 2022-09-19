@@ -42,8 +42,6 @@ class TodoActivity : AppCompatActivity() {
 }
 @Composable
 private fun TodoActivityScreen(todoViewModel: TodoViewModel) {
-//    val items: List<TodoItem> by todoViewModel.todoItems.observeAsState(listOf())
-//    val items = listOf<TodoItem>() // in the next steps we'll complete this
     TodoScreen(
         items = todoViewModel.todoItems,
         currentlyEditing = todoViewModel.currentEditItem,
