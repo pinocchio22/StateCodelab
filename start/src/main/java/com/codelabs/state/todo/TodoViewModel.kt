@@ -26,21 +26,6 @@ import androidx.lifecycle.ViewModel
 
 class TodoViewModel : ViewModel() {
 
-    // state 데이터 상태
-//    private var _todoItems = MutableLiveData(listOf<TodoItem>())
-//    val todoItems: LiveData<List<TodoItem>> = _todoItems
-//
-//
-//    fun addItem(item: TodoItem) {
-//        _todoItems.value = _todoItems.value!! + listOf(item)
-//    }
-//
-//    fun removeItem(item: TodoItem) {
-//        _todoItems.value = _todoItems.value!!.toMutableList().also {
-//            it.remove(item)
-//        }
-//    }
-
     // private state
     private var currentEditPosition by mutableStateOf(-1)
 
